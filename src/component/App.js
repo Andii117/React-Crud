@@ -18,7 +18,8 @@ class  App extends React.Component {
       personaje:"",
       anime:""
     },
-    modalInserta:false
+    modalInserta:false,
+    modalEditar: false
   }
 
   handleChange = event =>{
@@ -41,6 +42,56 @@ class  App extends React.Component {
       modalInserta: false
     });
   }
+
+  insertarAnime=()=>{
+    var valor_nuevo={...this.state.form};
+    valor_nuevo.id=this.state.data.length+1;
+    var lista=this.state.data;
+    lista.push(valor_nuevo);
+    this.setState({data: lista, modalInserta:false});
+  }
+ 
+  mostrarModalEditar = (anime) =>{
+    this.setState({
+      modalEditar: true,
+      form: anime
+    });
+  }
+
+  ocultarModalEditar = () =>{
+    this.setState({
+      modalEditar: false
+    });
+  }
+
+  editarAnime=(anime)=>{
+    let contador=0;
+    let lista=this.state.data;
+    lista.map((registro)=>{
+      if(anime.id==registro.id){
+        lista[contador].personaje=anime.personaje;
+        lista[contador].anime=anime.anime;
+      }
+      contador++;
+      this.setState({data:lista, modalEditar:false});
+    }
+    )
+  }
+
+Eliminar=(anime)=>{
+  var opcion=window.confirm("Realmente desea elminar el anime"+anime.anime);
+  if(opcion){
+    var contador=0;
+    var lista= this.state.data;
+    lista.map((registro)=>{
+      if(registro.id==anime.id){
+        lista.splice(contador, 1);
+      }
+    contador++;
+    this.setState({data: lista, modalEditar:false});
+    })
+  }
+}
 
   render(){
     return (
@@ -65,8 +116,8 @@ class  App extends React.Component {
                     <td>{anime.id}</td>
                     <td>{anime.personaje}</td>
                     <td>{anime.anime}</td>
-                    <td><Button color="primary">Editar</Button>{"  "}
-                      <Button color="danger">Eliminar</Button></td>
+                    <td><Button color="primary" onClick={()=>this.mostrarModalEditar(anime)}>Editar</Button>{"  "}
+                      <Button color="danger" onClick={()=>this.Eliminar(anime)}>Eliminar</Button></td>
                     
                   </tr>
                     )
@@ -97,8 +148,34 @@ class  App extends React.Component {
               </FormGroup>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary">Insertar</Button>{"  "}
+              <Button color="primary" onClick={()=>{this.insertarAnime()}}>Insertar</Button>{"  "}
               <Button color="danger" onClick={()=>{this.ocultarModalInsertar()}}>Cancelar</Button>
+            </ModalFooter>
+          </Modal>
+
+          <Modal isOpen={this.state.modalEditar}>
+            <ModalHeader>
+              <div>
+                <h3>Editar registro</h3>
+              </div>
+            </ModalHeader>
+            <ModalBody>
+              <FormGroup>
+                <label>id:</label>
+                <input className="form-control" name="id" type="text" readOnly value={this.state.form.id}/>
+              </FormGroup>
+              <FormGroup>
+                <label>Personaje: </label>
+                <input className="form-control" name="personaje" type="text" value={this.state.form.personaje} onChange={this.handleChange}></input>
+              </FormGroup>
+              <FormGroup>
+                <label>Anime: </label>
+                <input className="form-control" name="anime" type="text" value={this.state.form.anime} onChange={this.handleChange}></input>
+              </FormGroup>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={()=>{this.editarAnime(this.state.form)}}>Aceptar</Button>{"  "}
+              <Button color="danger" onClick={()=>this.ocultarModalEditar()}>Cancelar</Button>
             </ModalFooter>
           </Modal>
 
